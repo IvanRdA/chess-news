@@ -9,3 +9,59 @@ datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id        Int      @id @default(autoincrement())
+  // USER INFORMATION
+  firstName String
+  lastName  String
+  email     String   @unique
+  userName  String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  role      String   @default("User")
+
+  // PROFILE
+  profile Profile?
+
+  // COMMENTS
+  comments Comment[]
+}
+
+model Comment {
+  id Int @id @default(autoincrement())
+
+  // USER RELATION
+  authorId Int
+  author   User @relation(fields: [authorId], references: [id])
+}
+
+model Profile {
+  id Int @id @default(autoincrement())
+
+  // USER RELATION
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id])
+
+  // FIELDS
+  bio             String?
+  avatar          String?     @default("/img/avatars/generic.png")
+  chesscomProfile String?
+  lichessProfile  String?
+  FIDEid          String?
+  chessClub       String?
+  federation      Federation?
+}
+
+model Federation {
+  id Int @id @default(autoincrement())
+
+  // PROFILE RELATION
+  profileId Int?     @unique
+  profile   Profile? @relation(fields: [profileId], references: [id])
+
+  // FIELDS
+  name String
+  slug String @unique
+  flag String @default("/img/flags/CAT.png")
+}
